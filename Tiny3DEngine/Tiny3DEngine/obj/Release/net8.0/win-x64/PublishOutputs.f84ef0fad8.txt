@@ -1,0 +1,3 @@
+C:\Users\chull\Tiny3DEngine\Tiny3DEngine\bin\Release\net8.0\win-x64\publish\Tiny3DEngine.pdb
+C:\Users\chull\Tiny3DEngine\Tiny3DEngine\bin\Release\net8.0\win-x64\publish\glfw3.dll
+C:\Users\chull\Tiny3DEngine\Tiny3DEngine\bin\Release\net8.0\win-x64\publish\Tiny3DEngine.exe
