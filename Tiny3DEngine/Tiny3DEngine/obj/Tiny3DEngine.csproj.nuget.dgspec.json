@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\chull\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj": {}
+    "C:\\Users\\chull\\RUSTBUCKET-Engine\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj": {}
   },
   "projects": {
-    "C:\\Users\\chull\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj": {
+    "C:\\Users\\chull\\RUSTBUCKET-Engine\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\chull\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj",
+        "projectUniqueName": "C:\\Users\\chull\\RUSTBUCKET-Engine\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj",
         "projectName": "Tiny3DEngine",
-        "projectPath": "C:\\Users\\chull\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj",
+        "projectPath": "C:\\Users\\chull\\RUSTBUCKET-Engine\\Tiny3DEngine\\Tiny3DEngine\\Tiny3DEngine.csproj",
         "packagesPath": "C:\\Users\\chull\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\chull\\Tiny3DEngine\\Tiny3DEngine\\obj\\",
+        "outputPath": "C:\\Users\\chull\\RUSTBUCKET-Engine\\Tiny3DEngine\\Tiny3DEngine\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\chull\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -46,6 +46,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "ImGui.NET": {
+              "target": "Package",
+              "version": "[1.91.6.1, )"
+            },
             "OpenTK": {
               "target": "Package",
               "version": "[4.9.4, )"
