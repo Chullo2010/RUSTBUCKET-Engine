@@ -1,174 +1,134 @@
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Mathematics;
-using System;
-using System.IO;
 
-public class Game : GameWindow
+namespace Tiny3DEngine
 {
-    private enum GameState { Menu, Settings, Playing }
-    private GameState currentState = GameState.Menu;
-
-    private MenuUI menuUI;
-
-    private int VBO, VAO, EBO, shaderProgram;
-
-    private Camera camera;
-    private float rotation = 0f;
-
-    private float[] vertices =
+    public class Game : GameWindow
     {
-        -0.5f, -0.5f, -0.5f, 1f,0f,0f,
-         0.5f, -0.5f, -0.5f, 0f,1f,0f,
-         0.5f, 0.5f, -0.5f, 0f,0f,1f,
-        -0.5f, 0.5f, -0.5f, 1f,1f,0f,
-        -0.5f, -0.5f, 0.5f, 1f,0f,1f,
-         0.5f, -0.5f, 0.5f, 0f,1f,1f,
-         0.5f, 0.5f, 0.5f, 1f,1f,1f,
-        -0.5f, 0.5f, 0.5f, 0f,0f,0f
-    };
+        private Camera camera;
 
-    private uint[] indices =
-    {
-        0,1,2,2,3,0,
-        4,5,6,6,7,4,
-        0,4,7,7,3,0,
-        1,5,6,6,2,1,
-        0,1,5,5,4,0,
-        3,2,6,6,7,3
-    };
+        private float rotationAngle = 0f;
 
-    public Game(GameWindowSettings gws, NativeWindowSettings nws)
-        : base(gws, nws) { }
-
-    protected override void OnLoad()
-    {
-        base.OnLoad();
-
-        menuUI = new MenuUI(this);
-        currentState = GameState.Menu;
-
-        GL.ClearColor(0.1f, 0.1f, 0.1f, 1f);
-
-        camera = new Camera(new Vector3(0f,0f,3f));
-
-        int vertexShader = GL.CreateShader(ShaderType.VertexShader);
-        GL.ShaderSource(vertexShader, File.ReadAllText("shader.vert"));
-        GL.CompileShader(vertexShader);
-
-        int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-        GL.ShaderSource(fragmentShader, File.ReadAllText("shader.frag"));
-        GL.CompileShader(fragmentShader);
-
-        shaderProgram = GL.CreateProgram();
-        GL.AttachShader(shaderProgram, vertexShader);
-        GL.AttachShader(shaderProgram, fragmentShader);
-        GL.LinkProgram(shaderProgram);
-
-        GL.DeleteShader(vertexShader);
-        GL.DeleteShader(fragmentShader);
-
-        VAO = GL.GenVertexArray();
-        VBO = GL.GenBuffer();
-        EBO = GL.GenBuffer();
-
-        GL.BindVertexArray(VAO);
-        GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-        GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
-
-        GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
-        GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
-
-        GL.VertexAttribPointer(0,3,VertexAttribPointerType.Float,false,6*sizeof(float),0);
-        GL.EnableVertexAttribArray(0);
-
-        GL.VertexAttribPointer(1,3,VertexAttribPointerType.Float,false,6*sizeof(float),3*sizeof(float));
-        GL.EnableVertexAttribArray(1);
-
-        GL.Enable(EnableCap.DepthTest);
-    }
-
-    protected override void OnUpdateFrame(FrameEventArgs args)
-    {
-        base.OnUpdateFrame(args);
-        if (!IsFocused) return;
-
-        float delta = (float)args.Time;
-
-        if (currentState == GameState.Menu)
+        public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
+            : base(gameWindowSettings, nativeWindowSettings)
         {
-            menuUI.UpdateMenu(MouseState);
-            return;
-        }
-        if (currentState == GameState.Settings)
-        {
-            menuUI.UpdateSettings(MouseState);
-            return;
         }
 
-        var input = KeyboardState;
-
-        if (input.IsKeyDown(Keys.W)) camera.MoveForward(delta);
-        if (input.IsKeyDown(Keys.S)) camera.MoveBackward(delta);
-        if (input.IsKeyDown(Keys.A)) camera.MoveLeft(delta);
-        if (input.IsKeyDown(Keys.D)) camera.MoveRight(delta);
-
-        var mouse = MouseState;
-        if (camera.firstMove)
+        protected override void OnLoad()
         {
-            camera.lastMousePos = new Vector2(mouse.X, mouse.Y);
-            camera.firstMove = false;
+            base.OnLoad();
+
+            GL.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            GL.Enable(EnableCap.DepthTest);
+
+            // Initialize the camera
+            camera = new Camera(Vector3.UnitZ * 3f, Size.X / (float)Size.Y);
+
+            // Hide the cursor for first-person style control
+            CursorState = CursorState.Grabbed;
         }
-        else
+
+        protected override void OnUpdateFrame(FrameEventArgs args)
         {
-            float deltaX = mouse.X - camera.lastMousePos.X;
-            float deltaY = mouse.Y - camera.lastMousePos.Y;
-            camera.lastMousePos = new Vector2(mouse.X, mouse.Y);
-            camera.Rotate(deltaX, deltaY);
+            base.OnUpdateFrame(args);
+
+            var input = KeyboardState;
+
+            const float cameraSpeed = 2.5f;
+            const float sensitivity = 0.2f;
+
+            // Close the window
+            if (input.IsKeyDown(Keys.Escape))
+                Close();
+
+            // WASD movement
+            if (input.IsKeyDown(Keys.W))
+                camera.Position += camera.Front * cameraSpeed * (float)args.Time;
+            if (input.IsKeyDown(Keys.S))
+                camera.Position -= camera.Front * cameraSpeed * (float)args.Time;
+            if (input.IsKeyDown(Keys.A))
+                camera.Position -= camera.Right * cameraSpeed * (float)args.Time;
+            if (input.IsKeyDown(Keys.D))
+                camera.Position += camera.Right * cameraSpeed * (float)args.Time;
+
+            // Simple rotation animation for the sphere
+            rotationAngle += 50f * (float)args.Time; // degrees per second
         }
-    }
 
-    protected override void OnRenderFrame(FrameEventArgs args)
-    {
-        base.OnRenderFrame(args);
-        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-        if (currentState == GameState.Menu)
+        protected override void OnRenderFrame(FrameEventArgs args)
         {
-            menuUI.RenderMenu();
+            base.OnRenderFrame(args);
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            // Setup basic MVP matrix
+            Matrix4 model = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(rotationAngle));
+            Matrix4 view = camera.GetViewMatrix();
+            Matrix4 projection = camera.GetProjectionMatrix();
+
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref projection);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref view * model);
+
+            RenderSphere();
+
             SwapBuffers();
-            return;
         }
-        if (currentState == GameState.Settings)
+
+        private void RenderSphere()
         {
-            menuUI.RenderSettings();
-            SwapBuffers();
-            return;
+            int latitudeBands = 30;
+            int longitudeBands = 30;
+            float radius = 1.0f;
+
+            GL.Begin(PrimitiveType.Quads);
+            for (int latNumber = 0; latNumber < latitudeBands; latNumber++)
+            {
+                float theta = latNumber * MathF.PI / latitudeBands;
+                float thetaNext = (latNumber + 1) * MathF.PI / latitudeBands;
+
+                for (int longNumber = 0; longNumber < longitudeBands; longNumber++)
+                {
+                    float phi = longNumber * 2 * MathF.PI / longitudeBands;
+                    float phiNext = (longNumber + 1) * 2 * MathF.PI / longitudeBands;
+
+                    Vector3 v1 = SphericalToCartesian(radius, theta, phi);
+                    Vector3 v2 = SphericalToCartesian(radius, thetaNext, phi);
+                    Vector3 v3 = SphericalToCartesian(radius, thetaNext, phiNext);
+                    Vector3 v4 = SphericalToCartesian(radius, theta, phiNext);
+
+                    GL.Color3(0.4f, 0.7f, 1.0f);
+                    GL.Normal3(v1);
+                    GL.Vertex3(v1);
+                    GL.Normal3(v2);
+                    GL.Vertex3(v2);
+                    GL.Normal3(v3);
+                    GL.Vertex3(v3);
+                    GL.Normal3(v4);
+                    GL.Vertex3(v4);
+                }
+            }
+            GL.End();
         }
 
-        GL.UseProgram(shaderProgram);
-        GL.BindVertexArray(VAO);
+        private Vector3 SphericalToCartesian(float r, float theta, float phi)
+        {
+            float x = r * MathF.Sin(theta) * MathF.Cos(phi);
+            float y = r * MathF.Cos(theta);
+            float z = r * MathF.Sin(theta) * MathF.Sin(phi);
+            return new Vector3(x, y, z);
+        }
 
-        rotation += 50f * (float)args.Time;
-        Matrix4 model = Matrix4.CreateRotationY(MathHelper.DegreesToRadians(rotation));
-        Matrix4 view = camera.GetViewMatrix();
-        Matrix4 projection = camera.GetProjectionMatrix(Size.X / (float)Size.Y);
-
-        int modelLoc = GL.GetUniformLocation(shaderProgram, "model");
-        int viewLoc = GL.GetUniformLocation(shaderProgram, "view");
-        int projLoc = GL.GetUniformLocation(shaderProgram, "projection");
-
-        GL.UniformMatrix4(modelLoc,false,ref model);
-        GL.UniformMatrix4(viewLoc,false,ref view);
-        GL.UniformMatrix4(projLoc,false,ref projection);
-
-        GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt,0);
-        SwapBuffers();
+        protected override void OnResize(ResizeEventArgs e)
+        {
+            base.OnResize(e);
+            GL.Viewport(0, 0, e.Width, e.Height);
+            camera.AspectRatio = e.Width / (float)e.Height;
+        }
     }
-
-    public void StartGame() { currentState = GameState.Playing; CursorState = CursorState.Grabbed; }
-    public void OpenSettings() { currentState = GameState.Settings; CursorState = CursorState.Normal; }
-    public void ReturnToMenu() { currentState = GameState.Menu; CursorState = CursorState.Normal; }
 }

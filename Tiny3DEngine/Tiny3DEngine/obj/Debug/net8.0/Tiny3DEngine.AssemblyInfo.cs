@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tiny3DEngine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d751780b9d007a5c3e0410abcc29bd7dab14e7d2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31388392b9830313782209e01fda1f1f0fbe0f82")]
 [assembly: System.Reflection.AssemblyProductAttribute("Tiny3DEngine")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tiny3DEngine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

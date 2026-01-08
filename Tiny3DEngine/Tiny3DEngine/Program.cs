@@ -1,16 +1,27 @@
 ﻿using OpenTK.Windowing.Desktop;
 
-class Program
+namespace Tiny3DEngine
 {
-    static void Main()
+    internal class Program
     {
-        var nativeSettings = new NativeWindowSettings()
+        static void Main()
         {
-            Size = new OpenTK.Mathematics.Vector2i(1280, 720),
-            Title = "My Engine"
-        };
+            var gameSettings = new GameWindowSettings
+            {
+                RenderFrequency = 60,
+                UpdateFrequency = 60
+            };
 
-        using var window = new Game(GameWindowSettings.Default, nativeSettings);
-        window.Run();
+            var nativeSettings = new NativeWindowSettings
+            {
+                Title = "Tiny3DEngine",
+                Size = new OpenTK.Mathematics.Vector2i(800, 600)
+            };
+
+            using (var game = new Game(gameSettings, nativeSettings))
+            {
+                game.Run();
+            }
+        }
     }
 }
